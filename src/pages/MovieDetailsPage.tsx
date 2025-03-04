@@ -7,7 +7,7 @@ import {
   fetchSimilarMovies,
   getImageUrl,
 } from "../utils/api";
-
+import { useFavorites } from "../context/FavoritesContext";
 import VideoPlayer from "../components/VideoPlayer";
 import MovieRow from "../components/MovieRow";
 
@@ -16,6 +16,7 @@ export default function MovieDetailsPage() {
   const [movie, setMovie] = useState<MovieDetails | null>(null);
   const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isFavorite, addFavorite, removeFavorite } = useFavorites();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +52,14 @@ export default function MovieDetailsPage() {
     (video) => video.type === "Trailer"
   );
 
+  const handleFavoriteClick = () => {
+    if (isFavorite(movie.id)) {
+      removeFavorite(movie.id);
+    } else {
+      addFavorite(movie);
+    }
+  };
+
   const releaseYear = movie.release_date
     ? new Date(movie.release_date).getFullYear().toString()
     : "N/A";
@@ -76,8 +85,17 @@ export default function MovieDetailsPage() {
           <div className="w-full md:w-2/3 md:-mt-24">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-4xl font-bold">{movie.title}</h1>
-              <button className="p-2 rounded-full hover:bg-gray-800 transition-colors">
-                <Heart className={`w-6 h-6 `} />
+              <button
+                onClick={handleFavoriteClick}
+                className="p-2 rounded-full hover:bg-gray-800 transition-colors"
+              >
+                <Heart
+                  className={`w-6 h-6 ${
+                    isFavorite(movie.id)
+                      ? "fill-red-500 text-red-500"
+                      : "text-white"
+                  }`}
+                />
               </button>
             </div>
 
